@@ -1,0 +1,16 @@
+{
+  "name": "t-news-frontend",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "config": {
+    "api_url": "http://localhost:3000/api"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "sass": "^1.69.5",
+    "vite": "^4.5.0"
+  }
+}

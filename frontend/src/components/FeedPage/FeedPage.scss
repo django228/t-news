@@ -1,0 +1,186 @@
+.feed-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 824px;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.post-card {
+  background: #FFFFFF;
+  border-radius: 24px;
+  box-shadow: 0px 6px 34px 0px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  
+  .post-header {
+    padding: 20px 24px 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    
+    .post-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 24px;
+      object-fit: cover;
+    }
+    
+    .post-author {
+      font-family: 'Tinkoff Sans', sans-serif;
+      font-weight: 500;
+      font-size: 24px;
+      line-height: 1.17;
+      color: rgba(0, 0, 0, 0.8);
+    }
+  }
+  
+  .post-content {
+    padding: 0 24px 20px;
+    font-family: 'Neue Haas Unica W1G', sans-serif;
+    font-weight: 400;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #000000;
+  }
+  
+  .post-footer {
+    padding: 0 24px 24px;
+    display: flex;
+    gap: 12px;
+    
+    button {
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Neue Haas Unica W1G', sans-serif;
+      font-size: 15px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      
+      &.like-btn {
+        background: #FFDD2D;
+        color: #333333;
+        
+        svg {
+          width: 24px;
+          height: 24px;
+        }
+        
+        &.liked {
+          background: #FFDD2D;
+          
+          svg path {
+            fill: #1E1E1E;
+          }
+        }
+      }
+      
+      &.comments-btn {
+        background: rgba(36, 74, 127, 0.06);
+        color: #126DF7;
+      }
+    }
+  }
+  
+  .comments-section {
+    border-top: 1px solid rgba(0, 16, 36, 0.12);
+    padding: 16px 24px;
+    
+    .comments-list {
+      margin-bottom: 16px;
+      
+      .comment-item {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 16px;
+        
+        .comment-avatar {
+          width: 32px;
+          height: 32px;
+          border-radius: 16px;
+          object-fit: cover;
+          flex-shrink: 0;
+        }
+        
+        .comment-content-wrapper {
+          flex: 1;
+          
+          .comment-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+            
+            .comment-author {
+              font-family: 'Tinkoff Sans', sans-serif;
+              font-weight: 500;
+              font-size: 16px;
+              color: rgba(0, 0, 0, 0.8);
+            }
+            
+            .delete-comment-btn {
+              padding: 4px 8px;
+              border: none;
+              border-radius: 4px;
+              background: rgba(255, 0, 0, 0.1);
+              color: #f44336;
+              font-family: 'Neue Haas Unica W1G', sans-serif;
+              font-size: 12px;
+              cursor: pointer;
+              
+              &:hover {
+                background: rgba(255, 0, 0, 0.2);
+              }
+            }
+          }
+          
+          .comment-content {
+            font-family: 'Neue Haas Unica W1G', sans-serif;
+            font-size: 15px;
+            color: #000000;
+            line-height: 1.5;
+          }
+        }
+      }
+    }
+    
+    .comment-form {
+      display: flex;
+      gap: 8px;
+      
+      .comment-input {
+        flex: 1;
+        padding: 8px 12px;
+        border: none;
+        background: rgba(36, 74, 127, 0.06);
+        border-radius: 8px;
+        font-family: 'Neue Haas Unica W1G', sans-serif;
+        font-size: 15px;
+        color: #000;
+        
+        &::placeholder {
+          color: rgba(0, 0, 0, 0.54);
+        }
+      }
+      
+      .submit-comment-btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 8px;
+        background: #FFDD2D;
+        color: #333333;
+        font-family: 'Neue Haas Unica W1G', sans-serif;
+        font-size: 15px;
+        cursor: pointer;
+        
+        &:hover {
+          background: #FFD700;
+        }
+      }
+    }
+  }
+}

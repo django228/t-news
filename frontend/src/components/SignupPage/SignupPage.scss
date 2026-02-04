@@ -1,0 +1,110 @@
+.signup-page {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+  padding: 40px 20px;
+
+  .auth-header {
+    margin-bottom: 40px;
+    
+    .logo {
+      width: 29px;
+      height: 29px;
+    }
+  }
+}
+
+.signup-card {
+  background: #FFFFFF;
+  border-radius: 24px;
+  box-shadow: 0px 6px 34px 0px rgba(0, 0, 0, 0.12);
+  width: 414px;
+  
+  .card-header {
+    padding: 20px 24px;
+    
+    h2 {
+      font-family: 'Tinkoff Sans', sans-serif;
+      font-weight: 500;
+      font-size: 24px;
+      line-height: 1.17;
+      color: rgba(0, 0, 0, 0.8);
+      text-align: center;
+      margin: 0;
+    }
+  }
+  
+  .card-content {
+    padding: 0 24px 24px;
+    
+    .signup-form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      
+      .input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        
+        label {
+          font-family: 'Neue Haas Unica W1G', sans-serif;
+          font-weight: 400;
+          font-size: 15px;
+          line-height: 1.6;
+          color: rgba(0, 0, 0, 0.54);
+        }
+        
+        input {
+          padding: 6px 16px;
+          height: 48px;
+          border: none;
+          background: rgba(36, 74, 127, 0.06);
+          border-radius: 12px;
+          font-family: 'Neue Haas Unica W1G', sans-serif;
+          font-size: 15px;
+          color: #000;
+          
+          &::placeholder {
+            color: rgba(0, 0, 0, 0.54);
+          }
+        }
+      }
+    }
+  }
+  
+  .card-footer {
+    display: flex;
+    gap: 12px;
+    padding: 0 24px 24px;
+    
+    button, a {
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Neue Haas Unica W1G', sans-serif;
+      font-size: 15px;
+      cursor: pointer;
+      flex: 1;
+      text-decoration: none;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      &.btn-primary {
+        background: #FFDD2D;
+        color: #333333;
+      }
+      
+      &.btn-secondary {
+        background: rgba(36, 74, 127, 0.06);
+        color: #126DF7;
+      }
+    }
+  }
+}
+

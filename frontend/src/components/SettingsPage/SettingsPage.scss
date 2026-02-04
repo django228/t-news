@@ -1,0 +1,49 @@
+.settings-page {
+  max-width: 600px;
+  margin: 0 auto;
+  
+  h1 {
+    font-size: 36px;
+    margin-bottom: 32px;
+  }
+  
+  .settings-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      
+      label {
+        font-size: 15px;
+        font-weight: 500;
+      }
+      
+      input, textarea {
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid rgba(0, 16, 36, 0.12);
+        font-size: 15px;
+      }
+      
+      textarea {
+        min-height: 100px;
+        resize: vertical;
+      }
+    }
+    
+    button {
+      padding: 10px;
+      background: #FFDD2D;
+      color: #333333;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 15px;
+    }
+  }
+}
+

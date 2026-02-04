@@ -1,0 +1,197 @@
+.profile-page {
+  max-width: 824px;
+  margin: 0 auto;
+  padding: 24px;
+  
+  .profile-header {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 32px;
+    
+    .avatar-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      
+      .profile-avatar {
+        width: 128px;
+        height: 128px;
+        border-radius: 64px;
+        border: 3px solid #AFF218;
+        object-fit: cover;
+      }
+      
+      .change-avatar-btn {
+        padding: 6px 12px;
+        background: rgba(36, 74, 127, 0.06);
+        color: #126DF7;
+        border: 1px solid rgba(0, 16, 36, 0.12);
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        font-family: 'Neue Haas Unica W1G', sans-serif;
+        display: inline-block;
+        
+        &:hover {
+          background: rgba(36, 74, 127, 0.1);
+        }
+      }
+    }
+    
+    .profile-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      
+      .profile-username, .profile-username-input {
+        font-family: 'Tinkoff Sans', sans-serif;
+        font-weight: 500;
+        font-size: 36px;
+        margin: 0;
+        border: none;
+        background: transparent;
+        padding: 0;
+        
+        &.profile-username-input {
+          border: 1px solid rgba(0, 16, 36, 0.12);
+          border-radius: 8px;
+          padding: 8px 12px;
+          font-size: 24px;
+        }
+      }
+      
+      .profile-bio, .profile-bio-input {
+        font-size: 15px;
+        margin: 0;
+        border: none;
+        background: transparent;
+        padding: 0;
+        resize: vertical;
+        min-height: 60px;
+        
+        &.profile-bio-input {
+          border: 1px solid rgba(0, 16, 36, 0.12);
+          border-radius: 8px;
+          padding: 8px 12px;
+        }
+      }
+      
+      .save-profile-btn, .follow-btn {
+        padding: 8px 16px;
+        border: 1px solid rgba(0, 16, 36, 0.12);
+        border-radius: 8px;
+        background: transparent;
+        color: #126DF7;
+        cursor: pointer;
+        font-size: 15px;
+        align-self: flex-start;
+        
+        &.following {
+          background: rgba(36, 74, 127, 0.06);
+        }
+      }
+      
+      .save-profile-btn {
+        background: #FFDD2D;
+        color: #333333;
+        border: none;
+      }
+    }
+  }
+  
+  .create-post-section {
+    background: rgba(0, 16, 36, 0.03);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 24px;
+    
+    .post-input {
+      width: 100%;
+      min-height: 80px;
+      border: none;
+      background: transparent;
+      font-size: 15px;
+      margin-bottom: 15px;
+      resize: vertical;
+      font-family: inherit;
+      
+      &::placeholder {
+        color: rgba(0, 0, 0, 0.54);
+      }
+    }
+    
+    .create-post-btn {
+      padding: 8px 16px;
+      background: #FFDD2D;
+      color: #333333;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 15px;
+    }
+  }
+  
+  .posts-section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    
+    h2 {
+      font-family: 'Tinkoff Sans', sans-serif;
+      font-weight: 500;
+      font-size: 24px;
+      margin-bottom: 16px;
+    }
+    
+    .no-posts {
+      text-align: center;
+      color: rgba(0, 0, 0, 0.54);
+      padding: 40px;
+    }
+    
+    .post-card {
+      background: #FFFFFF;
+      border-radius: 24px;
+      padding: 20px 24px;
+      box-shadow: 0px 6px 34px 0px rgba(0, 0, 0, 0.12);
+      
+      .post-content {
+        font-family: 'Neue Haas Unica W1G', sans-serif;
+        font-weight: 400;
+        font-size: 15px;
+        line-height: 1.6;
+        margin-bottom: 16px;
+        color: #000000;
+      }
+      
+      .post-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 16px;
+        border-top: 1px solid rgba(0, 16, 36, 0.12);
+        
+        .post-stats {
+          display: flex;
+          gap: 16px;
+          font-family: 'Neue Haas Unica W1G', sans-serif;
+          font-size: 14px;
+          color: rgba(0, 0, 0, 0.54);
+        }
+        
+        .delete-post-btn {
+          padding: 6px 12px;
+          background: transparent;
+          border: 1px solid rgba(255, 0, 0, 0.3);
+          color: #ff0000;
+          border-radius: 8px;
+          cursor: pointer;
+          font-size: 14px;
+          font-family: 'Neue Haas Unica W1G', sans-serif;
+        }
+      }
+    }
+  }
+}
