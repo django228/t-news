@@ -1,0 +1,354 @@
+openapi: "3.0.3"
+info:
+  title: "Tweet-like Application API"
+  description: "API for a simple social media application where users can post, like, comment, and follow each other."
+  version: "1.0.0"
+servers:
+  - url: "http://localhost:3000/api"
+paths:
+  /users:
+    get:
+      summary: "Get all users"
+      responses:
+        '200':
+          description: "List of users"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+    post:
+      summary: "Create a new user"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewUser'
+      responses:
+        '201':
+          description: "User created"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /users/{userId}:
+    get:
+      summary: "Get user by ID"
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: "User details"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+    patch:
+      summary: "Update user profile"
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUser'
+      responses:
+        '200':
+          description: "User updated"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /users/{userId}/posts:
+    get:
+      summary: "Get all posts by user"
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: "List of user's posts"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Post'
+    post:
+      summary: "Create a new post"
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewPost'
+      responses:
+        '201':
+          description: "Post created"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+
+  /posts/{postId}:
+    delete:
+      summary: "Delete a post"
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: "Post deleted"
+
+  /posts/{postId}/likes:
+    post:
+      summary: "Like a post"
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: "Post liked"
+    delete:
+      summary: "Unlike a post"
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: "Post unliked"
+
+  /posts/{postId}/comments:
+    get:
+      summary: "Get all comments for a post"
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: "List of comments"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+    post:
+      summary: "Create a new comment"
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewComment'
+      responses:
+        '201':
+          description: "Comment created"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+
+  /comments/{commentId}:
+    delete:
+      summary: "Delete a comment"
+      parameters:
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: "Comment deleted"
+
+  /users/{userId}/follow:
+    post:
+      summary: "Follow a user"
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: "User followed"
+    delete:
+      summary: "Unfollow a user"
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: "User unfollowed"
+
+  /users/{userId}/following:
+    get:
+      summary: "Get list of users being followed"
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: "List of followed users"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+
+  /feed:
+    get:
+      summary: "Get feed of posts from followed users"
+      responses:
+        '200':
+          description: "List of posts from followed users"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Post'
+
+  /search:
+    get:
+      summary: "Search for users or posts"
+      parameters:
+        - name: query
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: type
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [users, posts]
+      responses:
+        '200':
+          description: "Search results"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  oneOf:
+                    - $ref: '#/components/schemas/User'
+                    - $ref: '#/components/schemas/Post'
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        avatar:
+          type: string
+        bio:
+          type: string
+        following:
+          type: array
+          items:
+            type: string
+    NewUser:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+    UpdateUser:
+      type: object
+      properties:
+        username:
+          type: string
+        bio:
+          type: string
+        avatar:
+          type: string
+    Post:
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        content:
+          type: string
+        likes:
+          type: integer
+        comments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Comment'
+    NewPost:
+      type: object
+      properties:
+        content:
+          type: string
+    Comment:
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        content:
+          type: string
+    NewComment:
+      type: object
+      properties:
+        content:
+          type: string
