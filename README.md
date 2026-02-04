@@ -16,10 +16,34 @@
 
 Настройки аккаунта: для изменения профиля и настроек пользователя (аватар, имя, биография, подписки).
 
-
-
 ### Макет 
 https://www.figma.com/design/Qg8G56Dkfc2CIzlUyho6Fs/T-News-students?node-id=0-1&t=wzRavexM4tVd7xsP-1
+
+### Итоговый результат
+
+#### Страница профиля
+<img src="screenshots/profile-page.png" alt="Страница профиля" width="500">
+
+#### Главная страница (без авторизации)
+<img src="screenshots/main(no-auth).png" alt="Главная страница без авторизации" width="500">
+
+#### Главная страница (с авторизацией)
+<img src="screenshots/main(auth).png" alt="Главная страница с авторизацией" width="500">
+
+#### Страница входа
+<img src="screenshots/login-page.png" alt="Страница входа" width="500">
+
+#### Страница регистрации
+<img src="screenshots/signup-page.png" alt="Страница регистрации" width="500">
+
+#### Страница поиска
+<img src="screenshots/search-page.png" alt="Страница поиска" width="500">
+
+#### Комментарии
+<img src="screenshots/comments.png" alt="Комментарии" width="500">
+
+#### Prisma Studio
+<img src="screenshots/prizma-studio.png" alt="Prisma Studio" width="500">
 
 ### API
 Файл с описанием API находится по пути: `openapi.yaml`
