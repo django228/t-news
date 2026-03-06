@@ -6,7 +6,7 @@
     "build": "vite build"
   },
   "config": {
-    "api_url": "https://t-news-m10a.onrender.com/api/"
+    "api_url": "https://t-news-m10a.onrender.com/api"
   },
   "dependencies": {},
   "devDependencies": {
