@@ -1,10 +1,12 @@
+import { baseUrl } from './baseUrl';
+
 export function AppTemplate() {
     return `
         <div class="app">
             <nav class="tui-navigation">
                 <div class="nav-container">
                     <div class="nav-left">
-                        <img src="/t-bank.svg" class="logo" alt="T-Bank">
+                        <img src="${baseUrl}t-bank.svg" class="logo" alt="T-Bank">
                         <div class="search-input-wrapper">
                             <input type="text" class="search-input" placeholder="Поиск по T-News">
                         </div>

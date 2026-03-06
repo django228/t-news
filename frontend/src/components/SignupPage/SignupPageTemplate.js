@@ -1,8 +1,10 @@
+import { baseUrl } from '../../baseUrl';
+
 export function signupPageTemplate({rootClass} = {}) {
     return `
         <div class="${rootClass}">
             <div class="auth-header">
-                <img src="/t-bank.svg" class="logo" alt="T-Bank">
+                <img src="${baseUrl}t-bank.svg" class="logo" alt="T-Bank">
             </div>
             <div class="signup-card">
                 <div class="card-header">

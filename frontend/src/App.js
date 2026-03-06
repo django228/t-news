@@ -1,5 +1,6 @@
 import {SandyElement} from './index';
 import {AppTemplate} from './AppTemplate';
+import { baseUrl } from './baseUrl';
 import AppStyles from './index.scss?inline';
 import {SERVICES} from './services/utils';
 import {inject} from '@/di/di';
@@ -405,19 +406,19 @@ export class App extends SandyElement {
             navRight.innerHTML = `
                 <a href="/logout" class="nav-link">
                     <span>Выйти</span>
-                    <img src="/arrow-in-right.svg" alt=">" width="24" height="24">
+                    <img src="${baseUrl}arrow-in-right.svg" alt=">" width="24" height="24">
                 </a>
-                <img src="${avatarUrl}" class="profile-avatar" alt="Profile" style="cursor: pointer;" onerror="this.src='/Master.svg'">
+                <img src="${avatarUrl}" class="profile-avatar" alt="Profile" style="cursor: pointer;" onerror="this.src='${baseUrl}Master.svg'">
             `;
         } else {
             navRight.innerHTML = `
                 <a href="/signup" class="nav-link">
                     <span>Зарегестрироваться</span>
-                    <img src="/arrow-in-right.svg" alt=">" width="24" height="24">
+                    <img src="${baseUrl}arrow-in-right.svg" alt=">" width="24" height="24">
                 </a>
                 <a href="/login" class="nav-link">
                     <span>Войти</span>
-                    <img src="/arrow-in-right.svg" alt=">" width="24" height="24">
+                    <img src="${baseUrl}arrow-in-right.svg" alt=">" width="24" height="24">
                 </a>
             `;
         }
