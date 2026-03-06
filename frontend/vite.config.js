@@ -8,5 +8,8 @@ export default defineConfig({
             '@': path.resolve(__dirname, './src'),
         },
     },
-    base: '/t-news/'
+    base: '/t-news/',
+    esbuild: {
+        keepNames: true,
+    },
 });
