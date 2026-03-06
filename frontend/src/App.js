@@ -1,6 +1,6 @@
 import {SandyElement} from './index';
 import {AppTemplate} from './AppTemplate';
-import { baseUrl } from './baseUrl';
+import { baseUrl, apiOrigin } from './baseUrl';
 import AppStyles from './index.scss?inline';
 import {SERVICES} from './services/utils';
 import {inject} from '@/di/di';
@@ -128,9 +128,10 @@ export class App extends SandyElement {
     async renderMainNoAuth(container) {
         try {
             const allPosts = await this.apiService.get('posts');
+            const defaultAvatar = baseUrl + 'Master.svg';
             const posts = allPosts.map(post => ({
                 ...post,
-                user: post.user || { username: 'User', id: post.userId, avatar: '/Master.svg' },
+                user: post.user || { username: 'User', id: post.userId, avatar: defaultAvatar },
                 likes: post.likes || [],
                 comments: post.comments || []
             }));
@@ -138,18 +139,16 @@ export class App extends SandyElement {
             const postsHtml = posts.map(post => {
                 const likesCount = post.likes?.length || 0;
                 const commentsCount = post.comments?.length || 0;
-                let avatarUrl = post.user?.avatar || '/Master.svg';
-                if (avatarUrl && !avatarUrl.startsWith('http') && !avatarUrl.startsWith('/') && avatarUrl !== '/Master.svg') {
-                    avatarUrl = `http://localhost:3000${avatarUrl}`;
-                } else if (avatarUrl && avatarUrl.startsWith('/uploads')) {
-                    avatarUrl = `http://localhost:3000${avatarUrl}`;
+                let avatarUrl = post.user?.avatar || defaultAvatar;
+                if (avatarUrl && !avatarUrl.startsWith('http') && avatarUrl !== defaultAvatar && avatarUrl.startsWith('/uploads')) {
+                    avatarUrl = `${apiOrigin}${avatarUrl}`;
                 }
                 const username = post.user?.username || 'User';
                 const userId = post.user?.id || post.userId;
                 return `
                     <div class="post-card" data-post-id="${post.id}">
                         <div class="post-header">
-                            <img src="${avatarUrl}" class="post-avatar" alt="Avatar" onerror="this.src='/Master.svg'" data-user-id="${userId}" style="cursor: pointer;">
+                            <img src="${avatarUrl}" class="post-avatar" alt="Avatar" onerror="this.src='${defaultAvatar}'" data-user-id="${userId}" style="cursor: pointer;">
                             <div class="post-author" data-user-id="${userId}" style="cursor: pointer;">${username}</div>
                         </div>
                         <div class="post-content">${post.content}</div>
@@ -205,18 +204,17 @@ export class App extends SandyElement {
             const searchType = 'users';
             const results = await this.apiService.get(`search?query=${encodeURIComponent(query)}&type=${searchType}`);
             
+            const defaultAvatar = baseUrl + 'Master.svg';
             const resultsHtml = results.length > 0
                 ? results.map(result => {
                     if (result.username) {
-                        let avatarUrl = result.avatar || '/Master.svg';
-                        if (avatarUrl && !avatarUrl.startsWith('http') && !avatarUrl.startsWith('/') && avatarUrl !== '/Master.svg') {
-                            avatarUrl = `http://localhost:3000${avatarUrl}`;
-                        } else if (avatarUrl && avatarUrl.startsWith('/uploads')) {
-                            avatarUrl = `http://localhost:3000${avatarUrl}`;
+                        let avatarUrl = result.avatar || defaultAvatar;
+                        if (avatarUrl && !avatarUrl.startsWith('http') && avatarUrl !== defaultAvatar && avatarUrl.startsWith('/uploads')) {
+                            avatarUrl = `${apiOrigin}${avatarUrl}`;
                         }
                         return `
                             <div class="search-user-card" data-user-id="${result.id}" style="cursor: pointer;">
-                                <img src="${avatarUrl}" class="user-avatar" alt="Avatar" onerror="this.src='/Master.svg'">
+                                <img src="${avatarUrl}" class="user-avatar" alt="Avatar" onerror="this.src='${defaultAvatar}'">
                                 <div class="user-info">
                                     <div class="user-name">${result.username}</div>
                                     ${result.bio ? `<div class="user-bio">${result.bio}</div>` : ''}
@@ -224,16 +222,14 @@ export class App extends SandyElement {
                             </div>
                         `;
                     } else {
-                        let avatarUrl = result.user?.avatar || '/Master.svg';
-                        if (avatarUrl && !avatarUrl.startsWith('http') && !avatarUrl.startsWith('/') && avatarUrl !== '/Master.svg') {
-                            avatarUrl = `http://localhost:3000${avatarUrl}`;
-                        } else if (avatarUrl && avatarUrl.startsWith('/uploads')) {
-                            avatarUrl = `http://localhost:3000${avatarUrl}`;
+                        let avatarUrl = result.user?.avatar || defaultAvatar;
+                        if (avatarUrl && !avatarUrl.startsWith('http') && avatarUrl !== defaultAvatar && avatarUrl.startsWith('/uploads')) {
+                            avatarUrl = `${apiOrigin}${avatarUrl}`;
                         }
                         return `
                             <div class="search-post-card" data-post-id="${result.id}">
                                 <div class="post-header">
-                                    <img src="${avatarUrl}" class="post-avatar" alt="Avatar" onerror="this.src='/Master.svg'" data-user-id="${result.userId}" style="cursor: pointer;">
+                                    <img src="${avatarUrl}" class="post-avatar" alt="Avatar" onerror="this.src='${defaultAvatar}'" data-user-id="${result.userId}" style="cursor: pointer;">
                                     <div class="post-author" data-user-id="${result.userId}" style="cursor: pointer;">${result.user?.username || 'User'}</div>
                                 </div>
                                 <div class="post-content">${result.content || ''}</div>
@@ -382,20 +378,19 @@ export class App extends SandyElement {
         if (!navRight) return;
 
         if (this.authService.isAuthenticated()) {
-            let avatarUrl = '/Master.svg';
+            const defaultAvatar = baseUrl + 'Master.svg';
+            let avatarUrl = defaultAvatar;
             try {
                 const currentUser = await this.apiService.get('auth/me');
                 if (currentUser.avatar) {
                     if (currentUser.avatar.startsWith('http')) {
                         avatarUrl = currentUser.avatar;
-                    } else if (currentUser.avatar.startsWith('/uploads')) {
-                        avatarUrl = `http://localhost:3000${currentUser.avatar}`;
-                    } else if (currentUser.avatar.startsWith('/')) {
-                        avatarUrl = currentUser.avatar;
+                    } else if (currentUser.avatar.startsWith('/uploads') || currentUser.avatar.startsWith('/')) {
+                        avatarUrl = `${apiOrigin}${currentUser.avatar}`;
                     } else {
-                        avatarUrl = `http://localhost:3000${currentUser.avatar}`;
+                        avatarUrl = `${apiOrigin}${currentUser.avatar}`;
                     }
-                    if (avatarUrl !== '/Master.svg') {
+                    if (avatarUrl !== defaultAvatar) {
                         const separator = avatarUrl.includes('?') ? '&' : '?';
                         avatarUrl = `${avatarUrl}${separator}t=${Date.now()}`;
                     }

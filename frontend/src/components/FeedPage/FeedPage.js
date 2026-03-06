@@ -3,6 +3,7 @@ import FeedPageStyles from './FeedPage.scss?inline';
 import {feedPageTemplate} from './FeedPageTemplate';
 import {SERVICES} from '@/services/utils';
 import {inject} from '@/di/di';
+import { baseUrl, apiOrigin } from '@/baseUrl';
 
 export class FeedPage extends SandyElement {
     static rootClass = 'feed-page';
@@ -45,7 +46,7 @@ export class FeedPage extends SandyElement {
             const posts = await this.apiService.get('feed');
             this.posts = posts.map(post => ({
                 ...post,
-                user: post.user || { username: 'User', id: post.userId, avatar: '/Master.svg' },
+                user: post.user || { username: 'User', id: post.userId, avatar: baseUrl + 'Master.svg' },
                 likes: post.likes || [],
                 comments: post.comments || []
             }));
@@ -218,11 +219,10 @@ export class FeedPage extends SandyElement {
         const likesCount = post.likes?.length || 0;
         const commentsCount = this.commentsData[post.id]?.length || post.comments?.length || 0;
         const heartFill = isLiked ? 'fill="#1E1E1E"' : '';
-        let avatarUrl = post.user?.avatar || '/Master.svg';
-        if (avatarUrl && !avatarUrl.startsWith('http') && !avatarUrl.startsWith('/') && avatarUrl !== '/Master.svg') {
-            avatarUrl = `http://localhost:3000${avatarUrl}`;
-        } else if (avatarUrl && avatarUrl.startsWith('/uploads')) {
-            avatarUrl = `http://localhost:3000${avatarUrl}`;
+        const defaultAvatar = baseUrl + 'Master.svg';
+        let avatarUrl = post.user?.avatar || defaultAvatar;
+        if (avatarUrl && !avatarUrl.startsWith('http') && avatarUrl !== defaultAvatar && avatarUrl.startsWith('/uploads')) {
+            avatarUrl = `${apiOrigin}${avatarUrl}`;
         }
         const userId = post.user?.id || post.userId;
         const isCommentsOpen = this.openComments[post.id];
@@ -231,17 +231,15 @@ export class FeedPage extends SandyElement {
         let commentsHtml = '';
         if (isCommentsOpen) {
             const commentsList = comments.map(comment => {
-                let commentAvatarUrl = comment.user?.avatar || '/Master.svg';
-                if (commentAvatarUrl && !commentAvatarUrl.startsWith('http') && !commentAvatarUrl.startsWith('/') && commentAvatarUrl !== '/Master.svg') {
-                    commentAvatarUrl = `http://localhost:3000${commentAvatarUrl}`;
-                } else if (commentAvatarUrl && commentAvatarUrl.startsWith('/uploads')) {
-                    commentAvatarUrl = `http://localhost:3000${commentAvatarUrl}`;
+                let commentAvatarUrl = comment.user?.avatar || defaultAvatar;
+                if (commentAvatarUrl && !commentAvatarUrl.startsWith('http') && commentAvatarUrl !== defaultAvatar && commentAvatarUrl.startsWith('/uploads')) {
+                    commentAvatarUrl = `${apiOrigin}${commentAvatarUrl}`;
                 }
                 const commentUserId = comment.user?.id || comment.userId;
                 const canDelete = commentUserId === currentUserId;
                 return `
                     <div class="comment-item">
-                        <img src="${commentAvatarUrl}" class="comment-avatar" alt="Avatar" onerror="this.src='/Master.svg'" data-user-id="${commentUserId}" style="cursor: pointer;">
+                        <img src="${commentAvatarUrl}" class="comment-avatar" alt="Avatar" onerror="this.src='${defaultAvatar}'" data-user-id="${commentUserId}" style="cursor: pointer;">
                         <div class="comment-content-wrapper">
                             <div class="comment-header">
                                 <span class="comment-author" data-user-id="${commentUserId}" style="cursor: pointer;">${comment.user?.username || 'User'}</span>
@@ -269,7 +267,7 @@ export class FeedPage extends SandyElement {
         return `
             <div class="post-card" data-post-id="${post.id}">
                 <div class="post-header">
-                    <img src="${avatarUrl}" class="post-avatar" alt="Avatar" onerror="this.src='/Master.svg'" data-user-id="${userId}" style="cursor: pointer;">
+                    <img src="${avatarUrl}" class="post-avatar" alt="Avatar" onerror="this.src='${defaultAvatar}'" data-user-id="${userId}" style="cursor: pointer;">
                     <div class="post-author" data-user-id="${userId}" style="cursor: pointer;">${post.user?.username || 'User'}</div>
                 </div>
                 <div class="post-content">${post.content}</div>

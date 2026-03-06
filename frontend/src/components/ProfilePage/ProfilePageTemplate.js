@@ -1,11 +1,12 @@
+import { baseUrl, apiOrigin } from '../../baseUrl';
+
 export function profilePageTemplate({rootClass} = {}, user = {}, posts = [], isOwnProfile = false, isFollowing = false) {
+    const defaultAvatar = baseUrl + 'Master.svg';
     const username = user?.username || 'Загрузка...';
     const bio = user?.bio || '';
-    let avatar = user?.avatar || '/Master.svg';
-    if (avatar && avatar !== '/Master.svg' && !avatar.startsWith('http') && !avatar.startsWith('/uploads')) {
-        avatar = `http://localhost:3000${avatar}`;
-    } else if (avatar && avatar.startsWith('/uploads')) {
-        avatar = `http://localhost:3000${avatar}`;
+    let avatar = user?.avatar || defaultAvatar;
+    if (avatar && avatar !== defaultAvatar && !avatar.startsWith('http') && avatar.startsWith('/uploads')) {
+        avatar = `${apiOrigin}${avatar}`;
     }
     
     const postsHtml = posts.length > 0 
@@ -31,7 +32,7 @@ export function profilePageTemplate({rootClass} = {}, user = {}, posts = [], isO
         <div class="${rootClass}">
             <div class="profile-header">
                 <div class="avatar-container">
-                    <img src="${avatar.startsWith('http') || avatar.startsWith('/') ? avatar : `http://localhost:3000${avatar}`}" class="profile-avatar" alt="Avatar" onerror="this.src='/Master.svg'">
+                    <img src="${avatar.startsWith('http') || avatar === defaultAvatar ? avatar : `${apiOrigin}${avatar}`}" class="profile-avatar" alt="Avatar" onerror="this.src='${defaultAvatar}'">
                     ${isOwnProfile ? `
                         <label class="change-avatar-btn">
                             <input type="file" accept="image/*" class="avatar-input" style="display: none;">

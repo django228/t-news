@@ -3,6 +3,7 @@ import MainNoAuthPageStyles from './MainNoAuthPage.scss?inline';
 import {mainNoAuthPageTemplate} from './MainNoAuthPageTemplate';
 import {SERVICES} from '@/services/utils';
 import {inject} from '@/di/di';
+import { baseUrl } from '@/baseUrl';
 
 export class MainNoAuthPage extends SandyElement {
     static rootClass = 'main-no-auth-page';
@@ -32,7 +33,7 @@ export class MainNoAuthPage extends SandyElement {
             const allPosts = await this.apiService.get('posts');
             this.posts = allPosts.map(post => ({
                 ...post,
-                user: post.user || { username: 'User', id: post.userId, avatar: '/Master.svg' },
+                user: post.user || { username: 'User', id: post.userId, avatar: baseUrl + 'Master.svg' },
                 likes: post.likes || [],
                 comments: post.comments || []
             }));
@@ -90,14 +91,15 @@ export class MainNoAuthPage extends SandyElement {
         const likesCount = post.likes?.length || 0;
         const commentsCount = post.comments?.length || 0;
         const user = post.user || {};
-        const avatarUrl = user.avatar || '/Master.svg';
+        const defaultAvatar = baseUrl + 'Master.svg';
+        const avatarUrl = user.avatar || defaultAvatar;
         const username = user.username || 'User';
         const userId = user.id || post.userId;
         
         return `
             <div class="post-card" data-post-id="${post.id}">
                 <div class="post-header">
-                    <img src="${avatarUrl}" class="post-avatar" alt="Avatar" onerror="this.src='/Master.svg'" data-user-id="${userId}" style="cursor: pointer;">
+                    <img src="${avatarUrl}" class="post-avatar" alt="Avatar" onerror="this.src='${defaultAvatar}'" data-user-id="${userId}" style="cursor: pointer;">
                     <div class="post-author" data-user-id="${userId}" style="cursor: pointer;">${username}</div>
                 </div>
                 <div class="post-content">${post.content}</div>
