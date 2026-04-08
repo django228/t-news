@@ -217,5 +217,102 @@ export class PostsService {
       likes: post.likes.map(l => l.userId),
     }));
   }
+
+  async getPublicFeedLite(limit = 20) {
+    const posts = await this.prisma.post.findMany({
+      take: limit,
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: {
+        id: true,
+        content: true,
+        createdAt: true,
+        userId: true,
+        user: {
+          select: {
+            username: true,
+            avatar: true,
+          },
+        },
+        _count: {
+          select: {
+            likes: true,
+            comments: true,
+          },
+        },
+      },
+    });
+
+    return posts.map(post => ({
+      id: post.id,
+      content: post.content,
+      createdAt: post.createdAt,
+      authorId: post.userId,
+      authorUsername: post.user.username,
+      authorAvatar: post.user.avatar || null,
+      likesCount: post._count.likes,
+      commentsCount: post._count.comments,
+      hasLiked: false,
+      isFollowingAuthor: false,
+    }));
+  }
+
+  async getPersonalizedFeed(userId: string, limit = 20) {
+    const followRows = await this.prisma.follow.findMany({
+      where: { followerId: userId },
+      select: { followingId: true },
+    });
+    const followingIds = followRows.map(f => f.followingId);
+
+    const where =
+      followingIds.length > 0
+        ? { OR: [{ userId: { in: followingIds } }, { userId }] }
+        : undefined;
+
+    const posts = await this.prisma.post.findMany({
+      take: limit,
+      where,
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: {
+        id: true,
+        content: true,
+        createdAt: true,
+        userId: true,
+        user: {
+          select: {
+            username: true,
+            avatar: true,
+          },
+        },
+        likes: {
+          where: { userId },
+          select: { userId: true },
+        },
+        _count: {
+          select: {
+            likes: true,
+            comments: true,
+          },
+        },
+      },
+    });
+
+    const followingSet = new Set(followingIds);
+    return posts.map(post => ({
+      id: post.id,
+      content: post.content,
+      createdAt: post.createdAt,
+      authorId: post.userId,
+      authorUsername: post.user.username,
+      authorAvatar: post.user.avatar || null,
+      likesCount: post._count.likes,
+      commentsCount: post._count.comments,
+      hasLiked: post.likes.length > 0,
+      isFollowingAuthor: followingSet.has(post.userId),
+    }));
+  }
 }
 
