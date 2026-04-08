@@ -1,7 +1,7 @@
 import {SandyElement} from '@/index';
 import DashboardPageStyles from './DashboardPage.scss?inline';
 import {dashboardPageTemplate} from './DashboardPageTemplate';
-import {apiOrigin} from '@/baseUrl';
+import {apiOrigin, graphqlHttpUrl} from '@/baseUrl';
 import pkg from '../../../package.json';
 
 export class DashboardPage extends SandyElement {
@@ -128,13 +128,25 @@ export class DashboardPage extends SandyElement {
 
         try {
             const g0 = performance.now();
-            const gRes = await fetch(`${apiOrigin}/graphql`, {
+            let gRes = await fetch(graphqlHttpUrl, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({query: '{ __typename }'}),
             });
+            if (!gRes.ok) {
+                gRes = await fetch(`${apiOrigin}/graphql`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({query: '{ __typename }'}),
+                });
+            }
             gqlMs = Math.round(performance.now() - g0);
-            gqlOk = gRes.ok;
+            const gqlJson = gRes.ok ? await gRes.json().catch(() => null) : null;
+            gqlOk =
+                gRes.ok &&
+                gqlJson &&
+                (!gqlJson.errors || gqlJson.errors.length === 0) &&
+                gqlJson.data !== undefined;
         } catch {
             gqlOk = false;
         }

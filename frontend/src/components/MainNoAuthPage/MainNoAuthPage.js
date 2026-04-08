@@ -3,7 +3,7 @@ import MainNoAuthPageStyles from './MainNoAuthPage.scss?inline';
 import {mainNoAuthPageTemplate} from './MainNoAuthPageTemplate';
 import {SERVICES} from '@/services/utils';
 import {inject} from '@/di/di';
-import { baseUrl } from '@/baseUrl';
+import { baseUrl, apiOrigin } from '@/baseUrl';
 
 export class MainNoAuthPage extends SandyElement {
     static rootClass = 'main-no-auth-page';
@@ -92,7 +92,10 @@ export class MainNoAuthPage extends SandyElement {
         const commentsCount = post.comments?.length || 0;
         const user = post.user || {};
         const defaultAvatar = baseUrl + 'Master.svg';
-        const avatarUrl = user.avatar || defaultAvatar;
+        let avatarUrl = user.avatar || defaultAvatar;
+        if (avatarUrl && !avatarUrl.startsWith('http') && avatarUrl !== defaultAvatar && avatarUrl.startsWith('/uploads')) {
+            avatarUrl = `${apiOrigin}${avatarUrl}`;
+        }
         const username = user.username || 'User';
         const userId = user.id || post.userId;
         

@@ -62,7 +62,7 @@ export function dashboardPageTemplate({rootClass} = {}) {
                         <span class="dash-pill dash-pill--pending" data-status="graphql">…</span>
                     </div>
                     <dl class="dash-dl">
-                        <div><dt>Эндпоинт</dt><dd><code data-gql-path>POST /graphql</code></dd></div>
+                        <div><dt>Эндпоинт</dt><dd><code data-gql-path>POST /api/graphql</code></dd></div>
                         <div><dt>Задержка</dt><dd data-gql-latency>—</dd></div>
                     </dl>
                 </article>

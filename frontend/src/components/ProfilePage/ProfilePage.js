@@ -3,6 +3,7 @@ import ProfilePageStyles from './ProfilePage.scss?inline';
 import {profilePageTemplate} from './ProfilePageTemplate';
 import {SERVICES} from '@/services/utils';
 import {inject} from '@/di/di';
+import {apiUrl} from '@/baseUrl';
 
 export class ProfilePage extends SandyElement {
     static rootClass = 'profile-page';
@@ -173,7 +174,7 @@ export class ProfilePage extends SandyElement {
         
         try {
             const token = this.apiService.getToken();
-            const response = await fetch(`http://localhost:3000/api/users/${this.userId}/avatar`, {
+            const response = await fetch(`${apiUrl}/users/${this.userId}/avatar`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,

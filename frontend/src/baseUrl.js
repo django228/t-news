@@ -13,3 +13,5 @@ export const apiUrl = configuredApiUrl.replace(/\/+$/, '');
 
 export const apiOrigin =
   apiUrl.replace(/\/api\/?$/, '') || 'http://localhost:3000';
+
+export const graphqlHttpUrl = `${apiOrigin}/api/graphql`;

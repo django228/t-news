@@ -16,6 +16,8 @@ import { GqlJwtAuthGuard } from './guards/gql-jwt-auth.guard';
   imports: [
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
+      path: '/graphql',
+      useGlobalPrefix: true,
       autoSchemaFile: 'schema.gql',
       sortSchema: true,
       context: ({ req }) => ({ req }),
