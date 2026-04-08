@@ -1,0 +1,100 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type AuthPayloadType {
+  access_token: String!
+  user: UserType!
+}
+
+type CommentType {
+  content: String!
+  createdAt: DateTime!
+  id: String!
+  postId: String!
+  updatedAt: DateTime!
+  user: UserType
+  userId: String!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type FeedItemType {
+  authorAvatar: String
+  authorId: String!
+  authorUsername: String!
+  commentsCount: Int!
+  content: String!
+  createdAt: DateTime!
+  hasLiked: Boolean!
+  id: String!
+  isFollowingAuthor: Boolean!
+  likesCount: Int!
+}
+
+type HomePageStatsType {
+  averageResponseTimeMs: Int!
+  postsInDb: Int!
+  totalRequests: Int!
+  usersInDb: Int!
+}
+
+type HomePageType {
+  feed: [FeedItemType!]!
+  me: UserType!
+  stats: HomePageStatsType!
+  suggestions: [UserType!]!
+}
+
+type Mutation {
+  createComment(content: String!, postId: String!): CommentType!
+  createPost(content: String!): PostType!
+  deleteComment(commentId: String!): Boolean!
+  deletePost(postId: String!): Boolean!
+  follow(userId: String!): Boolean!
+  like(postId: String!): PostType!
+  login(password: String!, username: String!): AuthPayloadType!
+  register(password: String!, username: String!): AuthPayloadType!
+  unfollow(userId: String!): Boolean!
+  unlike(postId: String!): PostType!
+  updateMe(avatar: String, bio: String, username: String): UserType!
+}
+
+type PostType {
+  comments: [CommentType!]
+  commentsCount: Int!
+  content: String!
+  createdAt: DateTime!
+  id: String!
+  likes: [String!]!
+  likesCount: Int!
+  updatedAt: DateTime!
+  user: UserType
+  userId: String!
+}
+
+type Query {
+  comments(postId: String!): [CommentType!]!
+  feed: [PostType!]!
+  homePage(feedLimit: Int, suggestionsLimit: Int): HomePageType!
+  personalizedFeed(limit: Int): [FeedItemType!]!
+  post(id: String!): PostType!
+  posts: [PostType!]!
+  publicFeedLite(limit: Int): [FeedItemType!]!
+  searchPosts(query: String!): [PostType!]!
+  searchUsers(query: String!): [UserType!]!
+  user(id: String!): UserType!
+  users: [UserType!]!
+}
+
+type UserType {
+  avatar: String
+  bio: String
+  createdAt: DateTime
+  id: String!
+  updatedAt: DateTime
+  username: String!
+}

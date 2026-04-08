@@ -8,9 +8,10 @@ import { FeedModule } from './feed/feed.module';
 import { MonitoringModule } from './monitoring/monitoring.module';
 import { MonitoringMiddleware } from './monitoring/monitoring.middleware';
 import { PrismaService } from './prisma/prisma.service';
+import { GraphqlAppModule } from './graphql/graphql.module';
 
 @Module({
-  imports: [UsersModule, PostsModule, CommentsModule, AuthModule, SearchModule, FeedModule, MonitoringModule],
+  imports: [UsersModule, PostsModule, CommentsModule, AuthModule, SearchModule, FeedModule, MonitoringModule, GraphqlAppModule],
   providers: [PrismaService],
 })
 export class AppModule implements NestModule {
