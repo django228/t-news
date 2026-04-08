@@ -1,6 +1,22 @@
-export const baseUrl = typeof import.meta !== 'undefined' && import.meta.env?.BASE_URL
-  ? import.meta.env.BASE_URL
-  : '/';
+function resolveBaseUrl() {
+  if (typeof import.meta !== 'undefined' && import.meta.url) {
+    try {
+      const pathname = new URL(import.meta.url).pathname;
+      const assetsIdx = pathname.indexOf('/assets/');
+      if (assetsIdx > 0) {
+        return `${pathname.slice(0, assetsIdx)}/`;
+      }
+    } catch {
+    }
+  }
+  const env = typeof import.meta !== 'undefined' && import.meta.env?.BASE_URL;
+  if (env) {
+    return env.endsWith('/') ? env : `${env}/`;
+  }
+  return '/';
+}
+
+export const baseUrl = resolveBaseUrl();
 
 import pkg from '../package.json';
 

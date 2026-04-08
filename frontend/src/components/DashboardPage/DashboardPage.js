@@ -1,7 +1,7 @@
 import {SandyElement} from '@/index';
 import DashboardPageStyles from './DashboardPage.scss?inline';
 import {dashboardPageTemplate} from './DashboardPageTemplate';
-import {apiOrigin, graphqlHttpUrl} from '@/baseUrl';
+import {apiOrigin, baseUrl, graphqlHttpUrl} from '@/baseUrl';
 import pkg from '../../../package.json';
 
 export class DashboardPage extends SandyElement {
@@ -42,7 +42,7 @@ export class DashboardPage extends SandyElement {
         const feTti = root.querySelector('[data-fe-tti]');
         const apiEl = root.querySelector('[data-api-origin]');
         if (feVersion) feVersion.textContent = pkg.version || '0.0.0';
-        if (feBase) feBase.textContent = (typeof import.meta !== 'undefined' && import.meta.env?.BASE_URL) || '/';
+        if (feBase) feBase.textContent = baseUrl;
         if (feTti) feTti.textContent = tti;
         if (apiEl) apiEl.textContent = apiOrigin;
         this.setPill(root, 'frontend', 'ok', 'готов');
