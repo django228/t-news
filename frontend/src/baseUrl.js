@@ -3,4 +3,13 @@ export const baseUrl = typeof import.meta !== 'undefined' && import.meta.env?.BA
   : '/';
 
 import pkg from '../package.json';
-export const apiOrigin = (pkg?.config?.api_url || 'http://localhost:3000/api').replace(/\/api\/?$/, '') || 'http://localhost:3000';
+
+const configuredApiUrl =
+  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_URL) ||
+  (import.meta.env?.DEV ? 'http://localhost:3000/api' : pkg?.config?.api_url) ||
+  'http://localhost:3000/api';
+
+export const apiUrl = configuredApiUrl.replace(/\/+$/, '');
+
+export const apiOrigin =
+  apiUrl.replace(/\/api\/?$/, '') || 'http://localhost:3000';

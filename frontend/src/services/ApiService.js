@@ -1,7 +1,6 @@
-import pkg from '../../package.json';
+import { apiUrl } from '../baseUrl';
 
 export function ApiService() {
-    const apiUrl = pkg.config.api_url;
     let token = localStorage.getItem('token');
 
     function setToken(newToken) {
