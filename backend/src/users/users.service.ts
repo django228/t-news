@@ -123,4 +123,25 @@ export class UsersService {
       },
     });
   }
+
+  async getSuggestedUsers(currentUserId: string, limit = 5) {
+    const following = await this.prisma.follow.findMany({
+      where: { followerId: currentUserId },
+      select: { followingId: true },
+    });
+    const excludeIds = [currentUserId, ...following.map(f => f.followingId)];
+    return this.prisma.user.findMany({
+      where: { id: { notIn: excludeIds } },
+      take: limit,
+      select: {
+        id: true,
+        username: true,
+        avatar: true,
+        bio: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
 }

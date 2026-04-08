@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
 
 interface RequestLog {
   method: string;
@@ -10,6 +11,8 @@ interface RequestLog {
 
 @Injectable()
 export class MonitoringService {
+  constructor(private readonly prisma: PrismaService) {}
+
   private logs: RequestLog[] = [];
   private readonly MAX_LOGS = 1000;
 
@@ -74,6 +77,20 @@ export class MonitoringService {
 
   clearLogs() {
     this.logs = [];
+  }
+
+  async getHomePageStatsSnapshot() {
+    const [usersInDb, postsInDb] = await Promise.all([
+      this.prisma.user.count(),
+      this.prisma.post.count(),
+    ]);
+    const mon = this.getStats();
+    return {
+      usersInDb,
+      postsInDb,
+      totalRequests: mon.totalRequests,
+      averageResponseTimeMs: mon.averageResponseTime,
+    };
   }
 }
 
