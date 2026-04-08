@@ -8,6 +8,7 @@ import { UsersModule } from '../users/users.module';
   imports: [PostsModule, UsersModule],
   controllers: [FeedController],
   providers: [FeedService],
+  exports: [FeedService],
 })
 export class FeedModule {}
 
