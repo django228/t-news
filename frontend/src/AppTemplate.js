@@ -10,6 +10,7 @@ export function AppTemplate() {
                         <div class="search-input-wrapper">
                             <input type="text" class="search-input" placeholder="Поиск по T-News">
                         </div>
+                        <a href="/dashboard" class="nav-link nav-dashboard-link">Статус</a>
                     </div>
                     <div class="nav-right" id="nav-right">
                     </div>
