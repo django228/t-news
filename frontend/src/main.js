@@ -10,10 +10,11 @@ import {SignupPage} from './components/SignupPage/SignupPage';
 import {ProfilePage} from './components/ProfilePage/ProfilePage';
 import {SearchPage} from './components/SearchPage/SearchPage';
 import {SettingsPage} from './components/SettingsPage/SettingsPage';
+import {DashboardPage} from './components/DashboardPage/DashboardPage';
 
 registry()
     .resetCss()
-    .register(App, FeedPage, MainNoAuthPage, LoginPage, SignupPage, ProfilePage, SearchPage, SettingsPage)
+    .register(App, FeedPage, MainNoAuthPage, LoginPage, SignupPage, ProfilePage, SearchPage, SettingsPage, DashboardPage)
     .provideService(
         [SERVICES.ApiService, ApiService],
         [SERVICES.AuthService, AuthService],

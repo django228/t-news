@@ -45,7 +45,12 @@ export class App extends SandyElement {
 
     handleRouteChange(route) {
         const isAuthPage = route === '/login' || route === '/signup';
-        const isAuthRequired = route !== '/login' && route !== '/signup' && route !== '' && route !== '/';
+        const isAuthRequired =
+            route !== '/login' &&
+            route !== '/signup' &&
+            route !== '' &&
+            route !== '/' &&
+            route !== '/dashboard';
         
         if (isAuthRequired && !this.authService.isAuthenticated()) {
             if (isAuthPage) {
@@ -109,6 +114,9 @@ export class App extends SandyElement {
                     break;
                 case '/settings':
                     componentName = 'settings-page-component';
+                    break;
+                case '/dashboard':
+                    componentName = 'dashboard-page-component';
                     break;
                 default:
                     content.innerHTML = '<p>Страница не найдена</p>';
@@ -176,11 +184,8 @@ export class App extends SandyElement {
                 const author = e.target.closest('.post-author');
                 
                 if (avatar || author) {
-                    const userId = (avatar || author).getAttribute('data-user-id');
-                    if (userId) {
-                        window.location.hash = `/profile/${userId}`;
-                        return;
-                    }
+                    this.showAuthRequiredAlert();
+                    return;
                 }
                 
                 const button = e.target.closest('button');
@@ -190,7 +195,7 @@ export class App extends SandyElement {
                 if (!postId) return;
 
                 if (button.classList.contains('like-btn') || button.classList.contains('comments-btn')) {
-                    window.location.hash = '/login';
+                    this.showAuthRequiredAlert();
                 }
             });
 
@@ -286,11 +291,19 @@ export class App extends SandyElement {
                 if (userCard) {
                     const userId = userCard.getAttribute('data-user-id');
                     if (userId) {
+                        if (!this.authService.isAuthenticated()) {
+                            this.showAuthRequiredAlert();
+                            return;
+                        }
                         window.location.hash = `/profile/${userId}`;
                     }
                 } else if (avatar || author) {
                     const userId = (avatar || author).getAttribute('data-user-id');
                     if (userId) {
+                        if (!this.authService.isAuthenticated()) {
+                            this.showAuthRequiredAlert();
+                            return;
+                        }
                         window.location.hash = `/profile/${userId}`;
                     }
                 }
@@ -361,6 +374,17 @@ export class App extends SandyElement {
                 }
             };
         }
+
+        const navLeft = this.shadowRoot.querySelector('.nav-left');
+        if (navLeft) {
+            navLeft.onclick = (e) => {
+                const anchor = e.target.closest('a[href]');
+                if (!anchor) return;
+                e.preventDefault();
+                const href = anchor.getAttribute('href');
+                if (href) this.router.navigate(href);
+            };
+        }
     }
 
     async updateNavigation() {
@@ -375,7 +399,11 @@ export class App extends SandyElement {
         
         nav.style.display = 'flex';
         const navRight = this.shadowRoot.querySelector('#nav-right');
+        const dashboardLink = this.shadowRoot.querySelector('.nav-dashboard-link');
         if (!navRight) return;
+        if (dashboardLink) {
+            dashboardLink.style.display = this.authService.isAuthenticated() ? 'inline-flex' : 'none';
+        }
 
         if (this.authService.isAuthenticated()) {
             const defaultAvatar = baseUrl + 'Master.svg';
@@ -420,5 +448,9 @@ export class App extends SandyElement {
         
         this.setupNavigationListeners();
         this.setupSearch();
+    }
+
+    showAuthRequiredAlert() {
+        alert('Требуется аутентификация');
     }
 }
