@@ -137,15 +137,11 @@ export class PostsService {
   }
 
   async like(postId: string, userId: string) {
-    try {
-      await this.prisma.postLike.create({
-        data: {
-          postId,
-          userId,
-        },
-      });
-    } catch (e) {
-    }
+    await this.prisma.postLike.upsert({
+      where: { postId_userId: { postId, userId } },
+      create: { postId, userId },
+      update: {},
+    });
     return this.findOne(postId);
   }
 

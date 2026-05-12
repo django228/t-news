@@ -16,19 +16,22 @@ export class SettingsPage extends SandyElement {
         this.user = {};
     }
 
+    render() {
+        super.render({rootClass: SettingsPage.rootClass});
+        this.setupEventListeners();
+    }
+
     async onReady() {
         await this.loadUser();
-        this.setupEventListeners();
     }
 
     async loadUser() {
         try {
             this.user = await this.apiService.get('auth/me');
-            this.render();
-        } catch (error) {
+        } catch {
             this.user = { username: '', bio: '', avatar: '' };
-            this.render();
         }
+        this.render();
     }
 
     setupEventListeners() {
@@ -48,13 +51,11 @@ export class SettingsPage extends SandyElement {
         };
 
         try {
-            const user = await this.apiService.get('auth/me');
-            await this.apiService.patch(`users/${user.id}`, updates);
+            await this.apiService.patch(`users/${this.user.id}`, updates);
             await this.loadUser();
             alert('Настройки сохранены');
-        } catch (error) {
-            alert('Ошибка');
+        } catch {
+            alert('Ошибка при сохранении настроек');
         }
     }
 }
-

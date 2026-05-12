@@ -29,15 +29,6 @@ export class FeedPage extends SandyElement {
         });
     }
     
-    render(...args) {
-        super.render(...args);
-        setTimeout(() => {
-            if (this.posts && this.posts.length > 0) {
-                this.updatePosts();
-            }
-        }, 100);
-    }
-
     async loadFeed() {
         if (this.isLoading) return;
         

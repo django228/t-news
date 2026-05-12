@@ -48,10 +48,9 @@ export class SignupPage extends SandyElement {
             this.showNotification('Успешная регистрация!');
             setTimeout(() => {
                 window.location.hash = '/';
-                window.location.reload();
             }, 1000);
-        } catch (error) {
-            alert('Ошибка регистрации');
+        } catch {
+            alert('Ошибка регистрации. Возможно, такой пользователь уже существует.');
         }
     }
 

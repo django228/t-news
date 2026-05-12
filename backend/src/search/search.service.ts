@@ -11,12 +11,9 @@ export class SearchService {
 
   async search(query: string, type: 'users' | 'posts') {
     if (type === 'users') {
-      const users = await this.usersService.findAll();
-      const lowerQuery = query.toLowerCase();
-      return users.filter(u => u.username.toLowerCase().includes(lowerQuery));
-    } else {
-      return this.postsService.search(query);
+      return this.usersService.searchByUsername(query);
     }
+    return this.postsService.search(query);
   }
 }
 

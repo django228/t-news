@@ -2,6 +2,7 @@ import { baseUrl, apiOrigin } from '../../baseUrl';
 
 export function searchPageTemplate({rootClass} = {}, results = [], searchType = 'users', query = '') {
     const defaultAvatar = baseUrl + 'Master.svg';
+
     const resultsHtml = results.length > 0
         ? results.map(result => {
             if (result.username) {
@@ -34,12 +35,13 @@ export function searchPageTemplate({rootClass} = {}, results = [], searchType = 
                 `;
             }
         }).join('')
-        : (query ? '<p style="text-align: center; padding: 40px;">Ничего не найдено</p>' : '<p style="text-align: center; padding: 40px;">Введите запрос для поиска</p>');
-    
+        : (query
+            ? '<p class="search-placeholder">Ничего не найдено</p>'
+            : '<p class="search-placeholder">Введите запрос для поиска</p>');
+
     return `
         <div class="${rootClass}">
-            <div class="search-header">
-                <input type="text" class="search-input" value="${query}" placeholder="Поиск по T-News">
+            <div class="search-controls">
                 <select class="type-toggle">
                     <option value="users" ${searchType === 'users' ? 'selected' : ''}>Пользователи</option>
                     <option value="posts" ${searchType === 'posts' ? 'selected' : ''}>Посты</option>
@@ -51,4 +53,3 @@ export function searchPageTemplate({rootClass} = {}, results = [], searchType = 
         </div>
     `;
 }
-
