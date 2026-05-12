@@ -28,8 +28,8 @@ export class PostsController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Delete a post' })
   @ApiResponse({ status: 204, description: 'Post deleted' })
-  remove(@Param('postId') postId: string, @CurrentUser() user: any) {
-    this.postsService.remove(postId, user.id);
+  async remove(@Param('postId') postId: string, @CurrentUser() user: any) {
+    await this.postsService.remove(postId, user.id);
   }
 
   @Post(':postId/likes')

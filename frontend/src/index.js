@@ -13,6 +13,7 @@ export class SandyElement extends HTMLElement {
 
     connectedCallback() {
         this.render();
+        this.onReady();
     }
 
     styles = function () {
@@ -38,7 +39,6 @@ export class SandyElement extends HTMLElement {
         const templateElem = document.createElement('template');
         templateElem.innerHTML = `${this.styles()}${this.template && this.template(...args)}`;
         this.shadowRoot.appendChild(templateElem.content.cloneNode(true));
-        this.onReady();
     }
 
     attributeChangedCallback(name, oldValue, newValue) {

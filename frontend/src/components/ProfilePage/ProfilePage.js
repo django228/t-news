@@ -14,8 +14,6 @@ export class ProfilePage extends SandyElement {
     isOwnProfile = false;
     isFollowing = false;
     isLoading = false;
-    listenersSetup = false;
-    isInitialized = false;
 
     constructor() {
         super(ProfilePageStyles, profilePageTemplate);
@@ -24,8 +22,8 @@ export class ProfilePage extends SandyElement {
         this.user = {};
         this.posts = [];
     }
-    
-    render(...args) {
+
+    render() {
         super.render(
             {rootClass: ProfilePage.rootClass},
             this.user || {},
@@ -33,45 +31,25 @@ export class ProfilePage extends SandyElement {
             this.isOwnProfile,
             this.isFollowing
         );
-        
-        if (!this.isInitialized) {
-            this.isInitialized = true;
-            setTimeout(() => this.onReady(), 0);
-        } else {
-            setTimeout(() => {
-                if (!this.listenersSetup) {
-                    this.setupEventListeners();
-                    this.listenersSetup = true;
-                }
-            }, 0);
-        }
+        setTimeout(() => this.setupEventListeners(), 0);
     }
 
     async onReady() {
         if (this.isLoading) return;
-        
         this.isLoading = true;
         try {
             await this.loadCurrentUser();
-            
+
             const userId = this.getAttribute('user-id');
-            if (userId) {
-                this.userId = userId;
-            } else {
-                this.userId = this.currentUserId;
-            }
-            
+            this.userId = userId || this.currentUserId;
             this.isOwnProfile = this.userId === this.currentUserId;
-            
-            await Promise.all([
-                this.loadProfile(),
-                this.loadPosts(),
-            ]);
-            
+
+            await Promise.all([this.loadProfile(), this.loadPosts()]);
+
             if (!this.isOwnProfile && this.currentUserId) {
                 await this.checkFollowing();
             }
-            
+
             this.render();
         } finally {
             this.isLoading = false;
@@ -80,34 +58,29 @@ export class ProfilePage extends SandyElement {
 
     async loadCurrentUser() {
         if (this.currentUserId) return;
-        
         try {
             const currentUser = await this.apiService.get('auth/me');
             this.currentUserId = currentUser.id;
-        } catch (error) {
+        } catch {
         }
     }
 
     async loadProfile() {
         try {
-            if (this.userId) {
-                this.user = await this.apiService.get(`users/${this.userId}`);
-            } else {
-                this.user = { username: 'Loading...', bio: '' };
-            }
-        } catch (error) {
+            this.user = this.userId
+                ? await this.apiService.get(`users/${this.userId}`)
+                : { username: 'Loading...', bio: '' };
+        } catch {
             this.user = { username: 'Error', bio: '' };
         }
     }
 
     async loadPosts() {
         try {
-            if (this.userId) {
-                this.posts = await this.apiService.get(`users/${this.userId}/posts`);
-            } else {
-                this.posts = [];
-            }
-        } catch (error) {
+            this.posts = this.userId
+                ? await this.apiService.get(`users/${this.userId}/posts`)
+                : [];
+        } catch {
             this.posts = [];
         }
     }
@@ -118,15 +91,15 @@ export class ProfilePage extends SandyElement {
                 const following = await this.apiService.get(`users/${this.currentUserId}/following`);
                 this.isFollowing = following.some(u => u.id === this.userId);
             }
-        } catch (error) {
+        } catch {
         }
     }
 
     setupEventListeners() {
         const container = this.shadowRoot.querySelector(`.${ProfilePage.rootClass}`);
-        if (!container || this.eventHandler) return;
+        if (!container) return;
 
-        this.eventHandler = async (e) => {
+        container.addEventListener('click', async (e) => {
             if (e.target.closest('.create-post-btn')) {
                 await this.createPost();
             } else if (e.target.closest('.follow-btn')) {
@@ -137,15 +110,12 @@ export class ProfilePage extends SandyElement {
                 const postId = e.target.closest('.delete-post-btn').getAttribute('data-post-id');
                 await this.deletePost(postId);
             }
-        };
-        
-        container.addEventListener('click', this.eventHandler);
-        
+        });
+
         const avatarInput = this.shadowRoot.querySelector('.avatar-input');
-        if (avatarInput && !avatarInput.hasAttribute('data-listener')) {
-            avatarInput.setAttribute('data-listener', 'true');
+        if (avatarInput) {
             avatarInput.addEventListener('change', (e) => {
-                if (e.target.files && e.target.files[0]) {
+                if (e.target.files?.[0]) {
                     this.uploadAvatar(e.target.files[0]);
                 }
             });
@@ -154,7 +124,6 @@ export class ProfilePage extends SandyElement {
 
     showNotification(message, type = 'success') {
         const notification = document.createElement('div');
-        notification.className = 'notification';
         notification.textContent = message;
         const bgColor = type === 'success' ? '#4CAF50' : '#f44336';
         notification.style.cssText = `position: fixed; top: 20px; right: 20px; background: ${bgColor}; color: white; padding: 16px 24px; border-radius: 8px; z-index: 10000; box-shadow: 0 4px 12px rgba(0,0,0,0.15);`;
@@ -167,35 +136,27 @@ export class ProfilePage extends SandyElement {
     }
 
     async uploadAvatar(file) {
-        if (!file) return;
-        
         const formData = new FormData();
         formData.append('avatar', file);
-        
+
         try {
             const token = this.apiService.getToken();
             const response = await fetch(`${apiUrl}/users/${this.userId}/avatar`, {
                 method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                },
+                headers: { 'Authorization': `Bearer ${token}` },
                 body: formData,
             });
-            
+
             if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(errorText || 'Failed to upload avatar');
+                throw new Error(await response.text() || 'Upload failed');
             }
-            
+
             const updatedUser = await response.json();
             this.user = updatedUser;
-            await this.loadProfile();
             this.render();
             this.showNotification('Аватарка успешно обновлена');
-            
-            const event = new CustomEvent('avatar-updated', { detail: { userId: this.userId, avatar: updatedUser.avatar } });
-            window.dispatchEvent(event);
-        } catch (error) {
+            window.dispatchEvent(new CustomEvent('avatar-updated', { detail: { userId: this.userId, avatar: updatedUser.avatar } }));
+        } catch {
             this.showNotification('Ошибка при загрузке аватарки', 'error');
         }
     }
@@ -211,10 +172,8 @@ export class ProfilePage extends SandyElement {
             await this.loadPosts();
             this.render();
             this.showNotification('Пост успешно опубликован');
-            
-            const event = new CustomEvent('post-created');
-            window.dispatchEvent(event);
-        } catch (error) {
+            window.dispatchEvent(new CustomEvent('post-created'));
+        } catch {
             this.showNotification('Ошибка при создании поста', 'error');
         }
     }
@@ -229,8 +188,8 @@ export class ProfilePage extends SandyElement {
                 this.isFollowing = true;
             }
             this.render();
-        } catch (error) {
-            alert('Ошибка');
+        } catch {
+            this.showNotification('Ошибка при подписке', 'error');
         }
     }
 
@@ -242,8 +201,8 @@ export class ProfilePage extends SandyElement {
             await this.apiService.patch(`users/${this.userId}`, { username, bio });
             await this.loadProfile();
             this.render();
-            this.showNotification('Профиль успешно сохранен');
-        } catch (error) {
+            this.showNotification('Профиль успешно сохранён');
+        } catch {
             this.showNotification('Ошибка при сохранении', 'error');
         }
     }
@@ -255,8 +214,8 @@ export class ProfilePage extends SandyElement {
             await this.apiService.delete(`posts/${postId}`);
             await this.loadPosts();
             this.render();
-        } catch (error) {
-            alert('Ошибка при удалении');
+        } catch {
+            this.showNotification('Ошибка при удалении поста', 'error');
         }
     }
 }

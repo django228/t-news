@@ -24,18 +24,16 @@ export class App extends SandyElement {
         this.router = RouterService();
         this.router.subscribe(this.handleRouteChange.bind(this));
     }
-    
+
     connectedCallback() {
         super.connectedCallback();
         const initialRoute = this.router.getCurrentRoute() || '/';
         this.handleRouteChange(initialRoute);
-        
-        this.avatarUpdateHandler = () => {
-            this.updateNavigation();
-        };
+
+        this.avatarUpdateHandler = () => this.updateNavigation();
         window.addEventListener('avatar-updated', this.avatarUpdateHandler);
     }
-    
+
     disconnectedCallback() {
         super.disconnectedCallback();
         if (this.avatarUpdateHandler) {
@@ -51,28 +49,21 @@ export class App extends SandyElement {
             route !== '' &&
             route !== '/' &&
             route !== '/dashboard';
-        
+
         if (isAuthRequired && !this.authService.isAuthenticated()) {
-            if (isAuthPage) {
-                this.currentRoute = route;
-            } else {
-                this.currentRoute = '/';
-            }
+            this.currentRoute = '/';
         } else if (isAuthPage && this.authService.isAuthenticated()) {
             this.router.navigate('/');
             return;
         } else {
             this.currentRoute = route || '/';
         }
-        
+
         this.render();
         this.loadPage();
         this.updateNavigation();
-        
-        setTimeout(() => {
-            this.setupSearch();
-        }, 0);
-        
+
+        setTimeout(() => this.setupSearch(), 0);
     }
 
     async loadPage() {
@@ -86,7 +77,7 @@ export class App extends SandyElement {
 
         let componentName = null;
         let userId = null;
-        
+
         if (this.currentRoute.startsWith('/profile/')) {
             componentName = 'profile-page-component';
             userId = this.currentRoute.replace('/profile/', '').split('?')[0];
@@ -141,7 +132,7 @@ export class App extends SandyElement {
                 ...post,
                 user: post.user || { username: 'User', id: post.userId, avatar: defaultAvatar },
                 likes: post.likes || [],
-                comments: post.comments || []
+                comments: post.comments || [],
             }));
 
             const postsHtml = posts.map(post => {
@@ -180,179 +171,61 @@ export class App extends SandyElement {
             `;
 
             container.addEventListener('click', (e) => {
-                const avatar = e.target.closest('.post-avatar');
-                const author = e.target.closest('.post-author');
-                
-                if (avatar || author) {
-                    this.showAuthRequiredAlert();
-                    return;
-                }
-                
-                const button = e.target.closest('button');
-                if (!button) return;
-                
-                const postId = button.getAttribute('data-post-id');
-                if (!postId) return;
+                const isInteractive =
+                    e.target.closest('.post-avatar') ||
+                    e.target.closest('.post-author') ||
+                    e.target.closest('.like-btn') ||
+                    e.target.closest('.comments-btn');
 
-                if (button.classList.contains('like-btn') || button.classList.contains('comments-btn')) {
+                if (isInteractive) {
                     this.showAuthRequiredAlert();
                 }
             });
 
-        } catch (error) {
+        } catch {
             container.innerHTML = '<p style="text-align: center; padding: 40px;">Ошибка загрузки постов</p>';
         }
     }
 
-    async renderSearch(container, query) {
-        try {
-            const searchType = 'users';
-            const results = await this.apiService.get(`search?query=${encodeURIComponent(query)}&type=${searchType}`);
-            
-            const defaultAvatar = baseUrl + 'Master.svg';
-            const resultsHtml = results.length > 0
-                ? results.map(result => {
-                    if (result.username) {
-                        let avatarUrl = result.avatar || defaultAvatar;
-                        if (avatarUrl && !avatarUrl.startsWith('http') && avatarUrl !== defaultAvatar && avatarUrl.startsWith('/uploads')) {
-                            avatarUrl = `${apiOrigin}${avatarUrl}`;
-                        }
-                        return `
-                            <div class="search-user-card" data-user-id="${result.id}" style="cursor: pointer;">
-                                <img src="${avatarUrl}" class="user-avatar" alt="Avatar" onerror="this.src='${defaultAvatar}'">
-                                <div class="user-info">
-                                    <div class="user-name">${result.username}</div>
-                                    ${result.bio ? `<div class="user-bio">${result.bio}</div>` : ''}
-                                </div>
-                            </div>
-                        `;
-                    } else {
-                        let avatarUrl = result.user?.avatar || defaultAvatar;
-                        if (avatarUrl && !avatarUrl.startsWith('http') && avatarUrl !== defaultAvatar && avatarUrl.startsWith('/uploads')) {
-                            avatarUrl = `${apiOrigin}${avatarUrl}`;
-                        }
-                        return `
-                            <div class="search-post-card" data-post-id="${result.id}">
-                                <div class="post-header">
-                                    <img src="${avatarUrl}" class="post-avatar" alt="Avatar" onerror="this.src='${defaultAvatar}'" data-user-id="${result.userId}" style="cursor: pointer;">
-                                    <div class="post-author" data-user-id="${result.userId}" style="cursor: pointer;">${result.user?.username || 'User'}</div>
-                                </div>
-                                <div class="post-content">${result.content || ''}</div>
-                            </div>
-                        `;
-                    }
-                }).join('')
-                : '<p style="text-align: center; padding: 40px;">Ничего не найдено</p>';
-            
-            container.innerHTML = `
-                <div class="search-results-page">
-                    <div class="search-header">
-                        <input type="text" class="search-input" value="${query}" placeholder="Поиск по T-News">
-                        <select class="type-toggle">
-                            <option value="users" selected>Пользователи</option>
-                            <option value="posts">Посты</option>
-                        </select>
-                    </div>
-                    <div class="search-results">
-                        ${resultsHtml}
-                    </div>
-                </div>
-            `;
-            
-            const searchInput = container.querySelector('.search-input');
-            const typeToggle = container.querySelector('.type-toggle');
-            
-            if (searchInput) {
-                searchInput.addEventListener('keypress', async (e) => {
-                    if (e.key === 'Enter') {
-                        const newQuery = e.target.value.trim();
-                        if (newQuery) {
-                            await this.renderSearch(container, newQuery);
-                        }
-                    }
-                });
-            }
-            
-            if (typeToggle) {
-                typeToggle.addEventListener('change', async (e) => {
-                    const query = searchInput?.value.trim() || query;
-                    if (query) {
-                        const results = await this.apiService.get(`search?query=${encodeURIComponent(query)}&type=${e.target.value}`);
-                        await this.renderSearch(container, query);
-                    }
-                });
-            }
-            
-            container.addEventListener('click', (e) => {
-                const userCard = e.target.closest('.search-user-card');
-                const avatar = e.target.closest('.post-avatar');
-                const author = e.target.closest('.post-author');
-                
-                if (userCard) {
-                    const userId = userCard.getAttribute('data-user-id');
-                    if (userId) {
-                        if (!this.authService.isAuthenticated()) {
-                            this.showAuthRequiredAlert();
-                            return;
-                        }
-                        window.location.hash = `/profile/${userId}`;
-                    }
-                } else if (avatar || author) {
-                    const userId = (avatar || author).getAttribute('data-user-id');
-                    if (userId) {
-                        if (!this.authService.isAuthenticated()) {
-                            this.showAuthRequiredAlert();
-                            return;
-                        }
-                        window.location.hash = `/profile/${userId}`;
-                    }
-                }
-            });
-        } catch (error) {
-            container.innerHTML = '<p style="text-align: center; padding: 40px;">Ошибка поиска</p>';
-        }
-    }
-
-    
     setupSearch() {
         const searchInput = this.shadowRoot.querySelector('.search-input');
         if (!searchInput) return;
-        
-        if (searchInput.hasAttribute('data-listener')) {
-            return;
-        }
-        
-        searchInput.setAttribute('data-listener', 'true');
-        searchInput.style.cursor = 'text';
-        
-        searchInput.addEventListener('click', () => {
-            if (this.currentRoute !== '/search' && !this.currentRoute.startsWith('/search?')) {
-                this.router.navigate('/search');
-            }
-        });
-        
-        searchInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                const query = e.target.value.trim();
-                if (query) {
-                    this.router.navigate(`/search?q=${encodeURIComponent(query)}`);
-                } else {
+
+        if (!searchInput.hasAttribute('data-listener')) {
+            searchInput.setAttribute('data-listener', 'true');
+            searchInput.style.cursor = 'text';
+
+
+            searchInput.addEventListener('click', () => {
+                if (!this.currentRoute.startsWith('/search')) {
                     this.router.navigate('/search');
                 }
-            }
-        });
+            });
+
+            searchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const query = e.target.value.trim();
+                    this.router.navigate(query ? `/search?q=${encodeURIComponent(query)}` : '/search');
+                }
+            });
+        }
+
+        if (this.currentRoute.startsWith('/search')) {
+            const params = new URLSearchParams(this.currentRoute.split('?')[1] || '');
+            searchInput.value = params.get('q') || '';
+        } else {
+            searchInput.value = '';
+        }
     }
 
     setupNavigationListeners() {
         const logo = this.shadowRoot.querySelector('.logo');
         if (logo) {
             logo.style.cursor = 'pointer';
-            logo.onclick = () => {
-                this.router.navigate('/');
-            };
+            logo.onclick = () => this.router.navigate('/');
         }
-        
+
         const navRight = this.shadowRoot.querySelector('#nav-right');
         if (navRight) {
             navRight.onclick = (e) => {
@@ -396,7 +269,7 @@ export class App extends SandyElement {
             nav.style.display = 'none';
             return;
         }
-        
+
         nav.style.display = 'flex';
         const navRight = this.shadowRoot.querySelector('#nav-right');
         const dashboardLink = this.shadowRoot.querySelector('.nav-dashboard-link');
@@ -411,21 +284,14 @@ export class App extends SandyElement {
             try {
                 const currentUser = await this.apiService.get('auth/me');
                 if (currentUser.avatar) {
-                    if (currentUser.avatar.startsWith('http')) {
-                        avatarUrl = currentUser.avatar;
-                    } else if (currentUser.avatar.startsWith('/uploads') || currentUser.avatar.startsWith('/')) {
-                        avatarUrl = `${apiOrigin}${currentUser.avatar}`;
-                    } else {
-                        avatarUrl = `${apiOrigin}${currentUser.avatar}`;
-                    }
-                    if (avatarUrl !== defaultAvatar) {
-                        const separator = avatarUrl.includes('?') ? '&' : '?';
-                        avatarUrl = `${avatarUrl}${separator}t=${Date.now()}`;
-                    }
+                    avatarUrl = currentUser.avatar.startsWith('http')
+                        ? currentUser.avatar
+                        : `${apiOrigin}${currentUser.avatar}`;
+                    avatarUrl += `${avatarUrl.includes('?') ? '&' : '?'}t=${Date.now()}`;
                 }
-            } catch (error) {
+            } catch {
             }
-            
+
             navRight.innerHTML = `
                 <a href="/logout" class="nav-link">
                     <span>Выйти</span>
@@ -436,7 +302,7 @@ export class App extends SandyElement {
         } else {
             navRight.innerHTML = `
                 <a href="/signup" class="nav-link">
-                    <span>Зарегестрироваться</span>
+                    <span>Зарегистрироваться</span>
                     <img src="${baseUrl}arrow-in-right.svg" alt=">" width="24" height="24">
                 </a>
                 <a href="/login" class="nav-link">
@@ -445,7 +311,7 @@ export class App extends SandyElement {
                 </a>
             `;
         }
-        
+
         this.setupNavigationListeners();
         this.setupSearch();
     }

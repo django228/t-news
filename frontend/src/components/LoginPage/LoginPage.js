@@ -42,10 +42,9 @@ export class LoginPage extends SandyElement {
             this.showNotification('Успешный вход!');
             setTimeout(() => {
                 window.location.hash = '/';
-                window.location.reload();
             }, 1000);
-        } catch (error) {
-            alert('Ошибка входа');
+        } catch {
+            alert('Ошибка входа. Проверьте логин и пароль.');
         }
     }
 
