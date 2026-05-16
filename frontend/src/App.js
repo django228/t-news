@@ -317,31 +317,67 @@ export class App extends SandyElement {
     setupSearch() {
         const searchInput = this.shadowRoot.querySelector('.search-input');
         if (!searchInput) return;
-        
-        if (searchInput.hasAttribute('data-listener')) {
-            return;
+
+        const typeFilter = this.shadowRoot.querySelector('.search-type-filter');
+        const onSearch = this.currentRoute.startsWith('/search');
+
+        if (typeFilter) {
+            typeFilter.style.display = onSearch ? 'flex' : 'none';
         }
-        
+
+        if (onSearch) {
+            const params = new URLSearchParams(this.currentRoute.split('?')[1] || '');
+            searchInput.value = params.get('q') || '';
+            this._syncFilterButtons(params.get('type') || 'users');
+        } else {
+            searchInput.value = '';
+        }
+
+        if (searchInput.hasAttribute('data-listener')) return;
         searchInput.setAttribute('data-listener', 'true');
         searchInput.style.cursor = 'text';
-        
+
         searchInput.addEventListener('click', () => {
-            if (this.currentRoute !== '/search' && !this.currentRoute.startsWith('/search?')) {
+            if (!this.currentRoute.startsWith('/search')) {
                 this.router.navigate('/search');
             }
         });
-        
+
         searchInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 const query = e.target.value.trim();
-                if (query) {
-                    this.router.navigate(`/search?q=${encodeURIComponent(query)}`);
-                } else {
-                    this.router.navigate('/search');
-                }
+                const type = this._getCurrentSearchType();
+                this.router.navigate(
+                    query ? `/search?q=${encodeURIComponent(query)}&type=${type}` : `/search?type=${type}`
+                );
             }
         });
+
+        if (typeFilter && !typeFilter.hasAttribute('data-listener')) {
+            typeFilter.setAttribute('data-listener', 'true');
+            typeFilter.addEventListener('click', (e) => {
+                const btn = e.target.closest('.filter-btn');
+                if (!btn) return;
+                const type = btn.getAttribute('data-type');
+                this._syncFilterButtons(type);
+                const query = searchInput.value.trim();
+                this.router.navigate(
+                    query ? `/search?q=${encodeURIComponent(query)}&type=${type}` : `/search?type=${type}`
+                );
+            });
+        }
+    }
+
+    _syncFilterButtons(activeType) {
+        this.shadowRoot.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.getAttribute('data-type') === activeType);
+        });
+    }
+
+    _getCurrentSearchType() {
+        const active = this.shadowRoot.querySelector('.filter-btn.active');
+        return active ? active.getAttribute('data-type') : 'users';
     }
 
     setupNavigationListeners() {

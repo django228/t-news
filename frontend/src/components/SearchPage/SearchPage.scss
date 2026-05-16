@@ -1,29 +1,7 @@
 .search-page {
   max-width: 824px;
   margin: 0 auto;
-  
-  .search-header {
-    display: flex;
-    gap: 16px;
-    margin-bottom: 24px;
-    
-    .search-input {
-      flex: 1;
-      padding: 8px 10px;
-      border-radius: 8px;
-      border: none;
-      background: rgba(36, 74, 127, 0.06);
-      font-size: 13px;
-    }
-    
-    .type-toggle {
-      padding: 8px 16px;
-      border-radius: 8px;
-      border: 1px solid rgba(0, 16, 36, 0.12);
-      background: #FFFFFF;
-    }
-  }
-  
+
   .search-results {
     display: flex;
     flex-direction: column;

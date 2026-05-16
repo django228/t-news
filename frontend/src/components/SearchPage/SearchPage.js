@@ -9,6 +9,9 @@ export class SearchPage extends SandyElement {
     apiService;
     searchType = 'users';
     query = '';
+    isSearching = false;
+    _initialized = false;
+    _hashChangeHandler = null;
 
     constructor() {
         super(SearchPageStyles, (args) => searchPageTemplate(args, this.results || [], this.searchType || 'users', this.query || ''));
@@ -17,121 +20,88 @@ export class SearchPage extends SandyElement {
     }
 
     onReady() {
-        this.loadQueryFromUrl();
-        
-        const searchInput = this.shadowRoot.querySelector('.search-input');
-        const typeToggle = this.shadowRoot.querySelector('.type-toggle');
-        
-        if (searchInput) {
-            if (this.query) {
-                searchInput.value = this.query;
-                this.performSearch();
-            }
-            
-            searchInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    this.query = e.target.value.trim();
-                    if (this.query) {
-                        window.location.hash = `/search?q=${encodeURIComponent(this.query)}`;
-                        this.performSearch();
-                    } else {
-                        this.results = [];
-                        this.render();
-                    }
-                }
-            });
-        }
+        this.setupResultListeners();
 
-        if (typeToggle) {
-            typeToggle.addEventListener('change', (e) => {
-                this.searchType = e.target.value;
-                if (this.query) {
+        if (!this._initialized) {
+            this._initialized = true;
+            this._readFromUrl();
+            this.performSearch();
+
+            this._hashChangeHandler = () => {
+                const prevQuery = this.query;
+                const prevType = this.searchType;
+                this._readFromUrl();
+                if (this.query !== prevQuery || this.searchType !== prevType) {
+                    this.isSearching = false;
                     this.performSearch();
                 }
-            });
-        }
-        
-        this.setupResultListeners();
-        
-        if (window.location.hash.startsWith('#/search')) {
-            const hash = window.location.hash;
-            const searchParams = new URLSearchParams(hash.split('?')[1] || '');
-            const urlQuery = searchParams.get('q') || '';
-            if (urlQuery && urlQuery !== this.query) {
-                this.query = urlQuery;
-                if (searchInput) {
-                    searchInput.value = this.query;
-                }
-                this.performSearch();
-            }
+            };
+            window.addEventListener('hashchange', this._hashChangeHandler);
         }
     }
-    
-    loadQueryFromUrl() {
-        const hash = window.location.hash;
-        const searchParams = new URLSearchParams(hash.split('?')[1] || '');
-        const urlQuery = searchParams.get('q') || '';
-        this.query = urlQuery;
+
+    onDisconnect() {
+        if (this._hashChangeHandler) {
+            window.removeEventListener('hashchange', this._hashChangeHandler);
+            this._hashChangeHandler = null;
+        }
+        this._initialized = false;
     }
-    
+
+    _readFromUrl() {
+        const hash = window.location.hash; // e.g. #/search?q=Платон&type=users
+        const qmark = hash.indexOf('?');
+        const params = new URLSearchParams(qmark >= 0 ? hash.slice(qmark + 1) : '');
+        this.query = params.get('q') || '';
+        this.searchType = params.get('type') || 'users';
+    }
+
     setupResultListeners() {
         const container = this.shadowRoot.querySelector(`.${SearchPage.rootClass}`);
         if (!container) return;
-        
+
         container.addEventListener('click', (e) => {
             const userCard = e.target.closest('.search-user-card');
-            const avatar = e.target.closest('.post-avatar');
-            const author = e.target.closest('.post-author');
-            
             if (userCard) {
                 const userId = userCard.getAttribute('data-user-id');
-                if (userId) {
-                    window.location.hash = `/profile/${userId}`;
-                }
-            } else if (avatar || author) {
-                const userId = (avatar || author).getAttribute('data-user-id');
-                if (userId) {
-                    window.location.hash = `/profile/${userId}`;
-                }
+                if (userId) window.location.hash = `/profile/${userId}`;
+                return;
+            }
+            const byAvatar = e.target.closest('.post-avatar');
+            const byAuthor = e.target.closest('.post-author');
+            if (byAvatar || byAuthor) {
+                const userId = (byAvatar || byAuthor).getAttribute('data-user-id');
+                if (userId) window.location.hash = `/profile/${userId}`;
             }
         });
     }
 
-    render(...args) {
-        const wasFocused = document.activeElement === this.shadowRoot?.querySelector('.search-input');
+    render() {
         super.render(
             {rootClass: SearchPage.rootClass},
             this.results || [],
             this.searchType || 'users',
             this.query || ''
         );
-        if (wasFocused) {
-            setTimeout(() => {
-                const searchInput = this.shadowRoot.querySelector('.search-input');
-                if (searchInput) {
-                    searchInput.focus();
-                    const cursorPos = searchInput.value.length;
-                    searchInput.setSelectionRange(cursorPos, cursorPos);
-                }
-            }, 0);
-        }
     }
 
     async performSearch() {
+        if (this.isSearching) return;
         if (!this.query) {
             this.results = [];
             this.render();
             return;
         }
-
+        this.isSearching = true;
         try {
-            this.results = await this.apiService.get(`search?query=${encodeURIComponent(this.query)}&type=${this.searchType}`);
-            this.render();
-        } catch (error) {
+            this.results = await this.apiService.get(
+                `search?query=${encodeURIComponent(this.query)}&type=${this.searchType}`
+            );
+        } catch {
             this.results = [];
-            this.render();
+        } finally {
+            this.isSearching = false;
         }
+        this.render();
     }
 }
-

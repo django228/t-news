@@ -38,13 +38,6 @@ export function searchPageTemplate({rootClass} = {}, results = [], searchType = 
     
     return `
         <div class="${rootClass}">
-            <div class="search-header">
-                <input type="text" class="search-input" value="${query}" placeholder="Поиск по T-News">
-                <select class="type-toggle">
-                    <option value="users" ${searchType === 'users' ? 'selected' : ''}>Пользователи</option>
-                    <option value="posts" ${searchType === 'posts' ? 'selected' : ''}>Посты</option>
-                </select>
-            </div>
             <div class="search-results">
                 ${resultsHtml}
             </div>
